@@ -9,6 +9,9 @@ const ProductSchema = new Schema({
     type: Number,
     min: 0,
   },
+  image: {
+    type: String,
+  },
   category: {
     type: String,
     enum: ["fruit", "vegetable"],

@@ -1,18 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Products</title>
-</head>
-<body>
+
+<% layout('layouts/boilerplate.ejs') %> 
     <h1>All Products here</h1>
-    <div><a href="/products/new">Add Product</a></div>
-    <ul>
+    <div class="d-flex flex-wrap">
         <% for(let product of products){ %> 
-            <li><a href="/products/<%= product._id %>"><%= product.name %></a></li>
+        <div class="card mb-3 mx-3" style="width: 400px">
+            <img src="https://images.unsplash.com/photo-1620706857370-e1b9770e8bb1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=464&q=80" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title"><%=product.name %></h5>
+              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+              <a href="/products/<%=product.id %>" class="btn btn-primary">Details</a>
+            </div>
+          </div>
         <% } %> 
-    </ul>
-</body>
-</html>
+    </div>

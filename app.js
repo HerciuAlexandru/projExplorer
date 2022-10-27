@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const port = 3000;
 const methodOverride = require("method-override");
+const ejsMate = require("ejs-mate");
 const app = express();
 
 const mongoose = require("mongoose");
@@ -9,6 +10,7 @@ const Product = require("./models/product");
 const { rmSync } = require("fs");
 
 // *************************************************************************************************************** //
+app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 

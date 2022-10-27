@@ -1,27 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Product</title>
-</head>
-<body>
-    <h1>New Product:</h1>
-    <form action="/products" method="POST">
-        <div>
-            <label for="name">Name</label>
-            <input type="text" name="product[name]" id="name">
-        </div>
+<% layout('layouts/boilerplate.ejs') %> 
 
-        <div>
-            <label for="category">Category</label>
-            <input type="text" name="product[category]" id="category">
+<div class="row">
+    <h1 class="text-center">New Product</h1>
+    <div class="col-6 offset-3">
+        <form action="/products" method="POST">
+            <div class="mb-3">
+                <label class="form-label" for="name">Name</label>
+                <input class="form-control" type="text" name="product[name]" id="name">
+            </div>
+    
+            <div class="mb-3">
+                <label class="form-label" for="category">Category</label>
+                <input class="form-control" type="text" name="product[category]" id="category">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="price">Product Price</label>
+                <div class="input-group">
+                    <span class="input-group-text" id="price-label">$</span>
+                    <input type="text" class="form-control" id="price" placeholder="0.00" aria-label="price"
+                        aria-describedby="price-label" name="product[price]">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="image">Image URL</label>
+                <input class="form-control" type="text" name="product[image]" id="category">
+            </div>
+
+
+            <div class="mb-3">
+            <button class="btn btn-success">Add Product</button>
         </div>
-        
-        <button>Add Product</button>
-  
-    </form>
-    <footer><a href="/products">All products</a></footer>
-</body>
-</html>
+        </form>
+       <a href="/products">All products</a>
+    </div>
+</div>
