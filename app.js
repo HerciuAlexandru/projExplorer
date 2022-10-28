@@ -4,10 +4,10 @@ const port = 3000;
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const app = express();
+const categories = ["fruits", "vegetables"];
 
 const mongoose = require("mongoose");
 const Product = require("./models/product");
-const { rmSync } = require("fs");
 
 // *************************************************************************************************************** //
 app.engine("ejs", ejsMate);
@@ -23,12 +23,18 @@ app.get("/", (req, res) => {
 });
 
 app.get("/products", async (req, res) => {
-  const products = await Product.find({});
-  res.render("products/index.ejs", { products });
+  const { category } = req.query;
+  if (category) {
+    const products = await Product.find({ category });
+    res.render("products/index.ejs", { products, category });
+  } else {
+    const products = await Product.find({});
+    res.render("products/index.ejs", { products, category: "All" });
+  }
 });
 
 app.get("/products/new", (req, res) => {
-  res.render("products/new.ejs");
+  res.render("products/new.ejs", { categories });
 });
 
 app.post("/products", async (req, res) => {
@@ -44,7 +50,7 @@ app.get("/products/:id", async (req, res) => {
 
 app.get("/products/:id/edit", async (req, res) => {
   const product = await Product.findById(req.params.id);
-  res.render("products/edit.ejs", { product });
+  res.render("products/edit.ejs", { product, categories });
 });
 
 app.put("/products/:id", async (req, res) => {
