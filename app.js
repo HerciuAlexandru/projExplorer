@@ -6,6 +6,9 @@ const ejsMate = require("ejs-mate");
 const app = express();
 const categories = ["fruits", "vegetables"];
 
+const expressError = require("./utility/ExpressError");
+const catchAsync = require("./utility/CatchAsync");
+
 const mongoose = require("mongoose");
 const Product = require("./models/product");
 
@@ -22,47 +25,77 @@ app.get("/", (req, res) => {
   res.render("home.ejs");
 });
 
-app.get("/products", async (req, res) => {
-  const { category } = req.query;
-  if (category) {
-    const products = await Product.find({ category });
-    res.render("products/index.ejs", { products, category });
-  } else {
-    const products = await Product.find({});
-    res.render("products/index.ejs", { products, category: "All" });
-  }
-});
+app.get(
+  "/products",
+  catchAsync(async (req, res) => {
+    const { category } = req.query;
+    if (category) {
+      const products = await Product.find({ category });
+      res.render("products/index.ejs", { products, category });
+    } else {
+      const products = await Product.find({});
+      res.render("products/index.ejs", { products, category: "All" });
+    }
+  })
+);
 
 app.get("/products/new", (req, res) => {
   res.render("products/new.ejs", { categories });
 });
 
-app.post("/products", async (req, res) => {
-  const product = new Product(req.body.product);
-  await product.save();
-  res.redirect(`/products/${product._id}`);
+app.post(
+  "/products",
+  catchAsync(async (req, res, next) => {
+    const product = new Product(req.body.product);
+    await product.save();
+    res.redirect(`/products/${product._id}`);
+  })
+);
+
+app.get(
+  "/products/:id",
+  catchAsync(async (req, res, next) => {
+    const product = await Product.findById(req.params.id);
+    res.render("products/show.ejs", { product });
+  })
+);
+
+app.get(
+  "/products/:id/edit",
+  catchAsync(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    res.render("products/edit.ejs", { product, categories });
+  })
+);
+
+app.put(
+  "/products/:id",
+  catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const product = await Product.findByIdAndUpdate(id, {
+      ...req.body.product,
+    });
+    res.redirect(`/products/${product._id}`);
+  })
+);
+
+app.delete(
+  "/products/:id",
+  catchAsync(async (req, res) => {
+    const { id } = req.params;
+    await Product.findByIdAndDelete(id);
+    res.redirect("/products");
+  })
+);
+
+app.all("*", (req, res, next) => {
+  next(new expressError("Page not found", 404));
 });
 
-app.get("/products/:id", async (req, res) => {
-  const product = await Product.findById(req.params.id);
-  res.render("products/show.ejs", { product });
-});
-
-app.get("/products/:id/edit", async (req, res) => {
-  const product = await Product.findById(req.params.id);
-  res.render("products/edit.ejs", { product, categories });
-});
-
-app.put("/products/:id", async (req, res) => {
-  const { id } = req.params;
-  const product = await Product.findByIdAndUpdate(id, { ...req.body.product });
-  res.redirect(`/products/${product._id}`);
-});
-
-app.delete("/products/:id", async (req, res) => {
-  const { id } = req.params;
-  await Product.findByIdAndDelete(id);
-  res.redirect("/products");
+app.use((err, req, res, next) => {
+  const { statusCode = 500 } = err;
+  if (!err.message) err.message = "Something went wrong!";
+  res.status(statusCode).render("error.ejs", { err });
 });
 
 // ***************************************************************************************************************** //

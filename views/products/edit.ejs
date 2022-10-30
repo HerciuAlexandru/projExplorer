@@ -2,10 +2,12 @@
     <div class="row">
         <h1 class="text-center">Edit Product</h1>
         <div class="col-6 offset-3">
-            <form action="/products/<%= product._id %>?_method=PUT" method="POST">
+            <form action="/products/<%= product._id %>?_method=PUT" method="POST" novalidate class="validated-form">
                 <div class="mb-3">
                     <label class="form-label" for="name">Name</label>
-                    <input class="form-control" type="text" name="product[name]" id="name" value="<%= product.name %>" >
+                    <input class="form-control" type="text" name="product[name]" id="name" value="<%= product.name %>"  required>
+                    <div class="valid-feedback">
+                        Looks good!</div>
                 </div>
         
                 <div class="mb-3">
@@ -21,13 +23,15 @@
                     <div class="input-group">
                         <span class="input-group-text" id="price-label">$</span>
                         <input type="text" class="form-control" id="price" placeholder="0.00" aria-label="price"
-                            aria-describedby="price-label" name="product[price]" value="<%= product.price %>">
+                            aria-describedby="price-label" name="product[price]" value="<%= product.price %>" required>
+                        <div class="valid-feedback">Looks good!</div>
                     </div>
                 </div>
     
                 <div class="mb-3">
                     <label class="form-label" for="image">Image URL</label>
-                    <input class="form-control" type="text" name="product[image]" id="category" value="<%= product.image %>">
+                    <input class="form-control" type="text" name="product[image]" id="category" value="<%= product.image %>" required>
+                    <div class="valid-feedback">Looks good!</div>
                 </div>
     
     

@@ -16,8 +16,6 @@ const ProductSchema = new Schema({
     type: String,
     enum: ["fruits", "vegetables"],
   },
-
-  location: String,
 });
 
 const Product = mongoose.model("Product", ProductSchema);
