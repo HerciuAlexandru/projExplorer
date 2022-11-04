@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema; // shortcut
 
-const ProductSchema = new Schema({
+const productSchema = new Schema({
   name: {
     type: String,
   },
@@ -22,6 +22,6 @@ const ProductSchema = new Schema({
   },
 });
 
-const Product = mongoose.model("Product", ProductSchema);
+const Product = mongoose.model("Product", productSchema);
 
 module.exports = Product;

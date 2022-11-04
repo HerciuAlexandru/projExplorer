@@ -10,8 +10,11 @@ const expressError = require("./utility/ExpressError");
 const catchAsync = require("./utility/CatchAsync");
 
 const mongoose = require("mongoose");
+const { reviewSchema } = require("./schemas.js");
 const Farm = require("./models/farm");
 const Product = require("./models/product");
+const Review = require("./models/review");
+const ExpressError = require("./utility/ExpressError");
 
 // *************************************************************************************************************** //
 app.engine("ejs", ejsMate);
@@ -24,6 +27,17 @@ app.use(methodOverride("_method"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// ***************************************************************************************************************** //
+
+const validateReview = (req, res, next) => {
+  const { error } = reviewSchema.validate(req.body);
+  if (error) {
+    const msg = error.details.map((el) => el.message).join(",");
+    throw new ExpressError(msg, 400);
+  } else {
+    next();
+  }
+};
 // ***************************************************************************************************************** //
 
 app.get("/farms", async (req, res) => {
@@ -42,7 +56,9 @@ app.post("/farms", async (req, res) => {
 });
 
 app.get("/farms/:id", async (req, res) => {
-  const farm = await Farm.findById(req.params.id).populate("products");
+  const farm = await Farm.findById(req.params.id)
+    .populate("products")
+    .populate("reviews");
   res.render("farms/show.ejs", { farm });
 });
 
@@ -86,6 +102,31 @@ app.delete("/farms/:id", async (req, res) => {
   const farm = await Farm.findByIdAndDelete(req.params.id);
   res.redirect("/farms");
 });
+
+app.post(
+  "/farms/:id/reviews",
+  validateReview,
+  catchAsync(async (req, res) => {
+    const farm = await Farm.findById(req.params.id);
+    const review = new Review(req.body.review);
+    farm.reviews.push(review);
+    await review.save();
+    await farm.save();
+    res.redirect(`/farms/${farm._id}`);
+  })
+);
+
+app.delete(
+  "/farms/:id/reviews/:reviewId",
+  catchAsync(async (req, res) => {
+    const { id, reviewId } = req.params;
+    const farm = await Farm.findByIdAndUpdate(id, {
+      $pull: { reviews: reviewId },
+    });
+    const review = await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/farms/${id}`);
+  })
+);
 //  href="/farms/<%= farm.id %>/edit">Edit</a>
 // ***************************************************************************************************************** //
 app.get("/", (req, res) => {
