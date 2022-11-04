@@ -46,6 +46,25 @@ app.get("/farms/:id", async (req, res) => {
   res.render("farms/show.ejs", { farm });
 });
 
+app.get(
+  "/farms/:id/edit",
+  catchAsync(async (req, res) => {
+    const farm = await Farm.findById(req.params.id);
+    res.render("farms/edit.ejs", { farm });
+  })
+);
+
+app.put(
+  "/farms/:id",
+  catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const farm = await Farm.findByIdAndUpdate(id, {
+      ...req.body.farm,
+    });
+    res.redirect(`/farms/${farm._id}`);
+  })
+);
+
 app.get("/farms/:id/products/new", async (req, res) => {
   const { id } = req.params;
   const farm = await Farm.findById(id);
