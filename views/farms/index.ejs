@@ -1,0 +1,22 @@
+
+<% layout('layouts/boilerplate.ejs') %> 
+
+  <h1>All farms here:</h1>
+  <div class="d-flex flex-wrap">
+      <% for(let farm of farms){ %> 
+      <div class="card mb-3 mx-3" style="width: 400px">
+        <img src="<%= farm.image %> " class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">Farm name :<%=farm.name %></h5>
+            <h3><%= farm._id %> </h3>
+            <p class="card-text">Farm origin:<%= farm.city %> </p>
+
+            <a class="card-link btn btn-info" href="/farms/<%= farm._id %>">Edit Farm</a>
+            <form class="d-inline" action="/farms/<%=farm._id %>?_method=DELETE" method="POST">
+                <button class="btn btn-danger">Delete</button>
+            </form>
+          </div>
+          
+        </div>
+      <% } %> 
+  </div>

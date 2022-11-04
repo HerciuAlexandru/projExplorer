@@ -16,6 +16,10 @@ const ProductSchema = new Schema({
     type: String,
     enum: ["fruits", "vegetables"],
   },
+  farm: {
+    type: Schema.Types.ObjectId,
+    ref: "Farm",
+  },
 });
 
 const Product = mongoose.model("Product", ProductSchema);

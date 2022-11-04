@@ -1,9 +1,9 @@
 <% layout('layouts/boilerplate.ejs') %> 
 
 <div class="row">
-    <h1 class="text-center">New Product</h1>
+    <h1 class="text-center">Add product to <%= farm.name %> </h1>
     <div class="col-6 offset-3">
-        <form action="/products" method="POST" novalidate class="validated-form">
+        <form action="/farms/<%= farm._id %>/products" method="POST" novalidate class="validated-form">
             <div class="mb-3">
                 <label class="form-label" for="name">Name</label>
                 <input class="form-control" type="text" name="product[name]" id="name" required>
@@ -45,7 +45,7 @@
             <button class="btn btn-success">Add Product</button>
         </div>
         </form>
-       <a href="/products">All products</a>
+       <a href="/farms/<%= farm._id %> ">Back to farm</a>
     </div>
 </div>
 

@@ -1,0 +1,48 @@
+<% layout('layouts/boilerplate.ejs') %> 
+
+<div class="row">
+    <h1 class="text-center">Add a farm</h1>
+    <div class="col-6 offset-3">
+        <form action="/farms" method="POST" novalidate class="validated-form">
+            <div class="mb-3">
+                <label class="form-label" for="name">Name</label>
+                <input class="form-control" type="text" name="farm[name]" id="name" required placeholder="Farm Name">
+                <div class="valid-feedback">
+                    Looks good!
+                  </div>
+            </div>
+    
+            <div class="mb-3">
+                <label class="form-label" for="city">City</label>
+                <input class="form-control" type="text" name="farm[city]" id="city" required placeholder="Farm city">
+                <div class="valid-feedback">
+                    Looks good!
+                  </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="email">Email</label>
+                <input class="form-control" type="email" name="farm[email]" id="email" required placeholder="email ">
+                <div class="valid-feedback">
+                    Looks good!
+                  </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="image">Image URL</label>
+                <input class="form-control" type="text" name="farm[image]" id="image" required>
+                <div class="valid-feedback">
+                    Looks good!
+                  </div>
+            </div>
+        
+            <div class="mb-3">
+              <button class="btn btn-success">Add Farm  </button>
+            </div>
+
+        </form>
+       <a href="/products">All products</a>
+    </div>
+</div>
+
+
