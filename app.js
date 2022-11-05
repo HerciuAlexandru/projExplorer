@@ -1,21 +1,28 @@
 const express = require("express");
-const path = require("path");
+const app = express();
 const port = 3000;
+const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
-const app = express();
-const categories = ["fruits", "vegetables"];
+const mongoose = require("mongoose");
+const session = require("express-session");
+const flash = require("connect-flash");
+
+const productsRoutes = require("./routes/products");
+const farmsRoutes = require("./routes/farms");
+const reviewsRoutes = require("./routes/reviews");
 
 const expressError = require("./utility/ExpressError");
-const catchAsync = require("./utility/CatchAsync");
-
-const mongoose = require("mongoose");
-const { reviewSchema } = require("./schemas.js");
-const Farm = require("./models/farm");
-const Product = require("./models/product");
-const Review = require("./models/review");
-const ExpressError = require("./utility/ExpressError");
-
+const sessionConfig = {
+  secret: "mysecret",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7, //1w
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+  },
+};
 // *************************************************************************************************************** //
 app.engine("ejs", ejsMate);
 
@@ -26,179 +33,23 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(methodOverride("_method"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(session(sessionConfig));
+app.use(flash());
 
-// ***************************************************************************************************************** //
-
-const validateReview = (req, res, next) => {
-  const { error } = reviewSchema.validate(req.body);
-  if (error) {
-    const msg = error.details.map((el) => el.message).join(",");
-    throw new ExpressError(msg, 400);
-  } else {
-    next();
-  }
-};
-// ***************************************************************************************************************** //
-
-app.get("/farms", async (req, res) => {
-  const farms = await Farm.find({});
-  res.render("farms/index", { farms });
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success"); //avem mereu acces la succes sau ce nume vrem noi in templateuri
+  res.locals.error = req.flash("error");
+  next();
 });
 
-app.get("/farms/new", async (req, res) => {
-  res.render("farms/new.ejs");
-});
-
-app.post("/farms", async (req, res) => {
-  const newFarm = new Farm(req.body.farm);
-  await newFarm.save();
-  res.redirect("/farms");
-});
-
-app.get("/farms/:id", async (req, res) => {
-  const farm = await Farm.findById(req.params.id)
-    .populate("products")
-    .populate("reviews");
-  res.render("farms/show.ejs", { farm });
-});
-
-app.get(
-  "/farms/:id/edit",
-  catchAsync(async (req, res) => {
-    const farm = await Farm.findById(req.params.id);
-    res.render("farms/edit.ejs", { farm });
-  })
-);
-
-app.put(
-  "/farms/:id",
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const farm = await Farm.findByIdAndUpdate(id, {
-      ...req.body.farm,
-    });
-    res.redirect(`/farms/${farm._id}`);
-  })
-);
-
-app.get("/farms/:id/products/new", async (req, res) => {
-  const { id } = req.params;
-  const farm = await Farm.findById(id);
-  res.render("products/new", { categories, farm });
-});
-
-app.post("/farms/:id/products", async (req, res) => {
-  const { id } = req.params;
-  const farm = await Farm.findById(id);
-  const product = new Product(req.body.product);
-  farm.products.push(product);
-  product.farm = farm;
-  await farm.save();
-  await product.save();
-  res.redirect(`/farms/${farm._id}`);
-});
-
-app.delete("/farms/:id", async (req, res) => {
-  const farm = await Farm.findByIdAndDelete(req.params.id);
-  res.redirect("/farms");
-});
-
-app.post(
-  "/farms/:id/reviews",
-  validateReview,
-  catchAsync(async (req, res) => {
-    const farm = await Farm.findById(req.params.id);
-    const review = new Review(req.body.review);
-    farm.reviews.push(review);
-    await review.save();
-    await farm.save();
-    res.redirect(`/farms/${farm._id}`);
-  })
-);
-
-app.delete(
-  "/farms/:id/reviews/:reviewId",
-  catchAsync(async (req, res) => {
-    const { id, reviewId } = req.params;
-    const farm = await Farm.findByIdAndUpdate(id, {
-      $pull: { reviews: reviewId },
-    });
-    const review = await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/farms/${id}`);
-  })
-);
-//  href="/farms/<%= farm.id %>/edit">Edit</a>
 // ***************************************************************************************************************** //
 app.get("/", (req, res) => {
   res.render("home.ejs");
 });
 
-app.get(
-  "/products",
-  catchAsync(async (req, res) => {
-    const { category } = req.query;
-    if (category) {
-      const products = await Product.find({ category });
-      res.render("products/index.ejs", { products, category });
-    } else {
-      const products = await Product.find({}).populate("farm");
-      res.render("products/index.ejs", {
-        products,
-        category: "All",
-      });
-    }
-  })
-);
-
-app.get("/products/new", async (req, res) => {
-  const farm = await Farm.find();
-  res.render("products/new.ejs", { categories, farm });
-});
-
-app.post(
-  "/products",
-  catchAsync(async (req, res, next) => {
-    const product = new Product(req.body.product);
-    await product.save();
-    res.redirect(`/products/${product._id}`);
-  })
-);
-
-app.get(
-  "/products/:id",
-  catchAsync(async (req, res, next) => {
-    const product = await Product.findById(req.params.id).populate("farm");
-    res.render("products/show.ejs", { product });
-  })
-);
-
-app.get(
-  "/products/:id/edit",
-  catchAsync(async (req, res) => {
-    const product = await Product.findById(req.params.id);
-    res.render("products/edit.ejs", { product, categories });
-  })
-);
-
-app.put(
-  "/products/:id",
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const product = await Product.findByIdAndUpdate(id, {
-      ...req.body.product,
-    });
-    res.redirect(`/products/${product._id}`);
-  })
-);
-
-app.delete(
-  "/products/:id",
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    await Product.findByIdAndDelete(id);
-    res.redirect("/products");
-  })
-);
+app.use("/products", productsRoutes);
+app.use("/farms", farmsRoutes);
+app.use("/farms/:id/reviews", reviewsRoutes);
 
 app.all("*", (req, res, next) => {
   next(new expressError("Page not found", 404));
