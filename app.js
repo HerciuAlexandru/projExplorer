@@ -7,12 +7,17 @@ const ejsMate = require("ejs-mate");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const flash = require("connect-flash");
+const passport = require("passport");
+const localStrategy = require("passport-local");
+const User = require("./models/user");
 
 const productsRoutes = require("./routes/products");
 const farmsRoutes = require("./routes/farms");
 const reviewsRoutes = require("./routes/reviews");
+const usersRoutes = require("./routes/users");
 
 const expressError = require("./utility/ExpressError");
+const { isLoggedIn } = require("./utility/middleware");
 const sessionConfig = {
   secret: "mysecret",
   resave: false,
@@ -36,17 +41,25 @@ app.use(express.json());
 app.use(session(sessionConfig));
 app.use(flash());
 
+app.use(passport.initialize());
+app.use(passport.session()); // persist logIn
+passport.use(new localStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 app.use((req, res, next) => {
+  res.locals.currentUser = req.user;
   res.locals.success = req.flash("success"); //avem mereu acces la succes sau ce nume vrem noi in templateuri
   res.locals.error = req.flash("error");
   next();
 });
 
 // ***************************************************************************************************************** //
-app.get("/", (req, res) => {
+app.get("/", isLoggedIn, (req, res) => {
   res.render("home.ejs");
 });
 
+app.use("/", usersRoutes);
 app.use("/products", productsRoutes);
 app.use("/farms", farmsRoutes);
 app.use("/farms/:id/reviews", reviewsRoutes);

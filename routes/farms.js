@@ -4,13 +4,14 @@ const expressError = require("../utility/ExpressError");
 const catchAsync = require("../utility/CatchAsync");
 const Farm = require("../models/farm");
 const Product = require("../models/product");
+const { isLoggedIn } = require("../utility/middleware");
 
 router.get("/", async (req, res) => {
   const farms = await Farm.find({});
   res.render("farms/index", { farms });
 });
 
-router.get("/new", async (req, res) => {
+router.get("/new", isLoggedIn, async (req, res) => {
   res.render("farms/new.ejs");
 });
 
@@ -21,7 +22,7 @@ router.post("/", async (req, res) => {
   res.redirect(`/farms/${farm._id}`);
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", isLoggedIn, async (req, res) => {
   const farm = await Farm.findById(req.params.id)
     .populate("products")
     .populate("reviews");
@@ -52,7 +53,7 @@ router.put(
   })
 );
 
-router.get("/:id/products/new", async (req, res) => {
+router.get("/:id/products/new", isLoggedIn, async (req, res) => {
   const { id } = req.params;
   const farm = await Farm.findById(id);
   res.render("products/new", { categories, farm });
