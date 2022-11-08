@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const expressError = require("../utility/ExpressError");
 const catchAsync = require("../utility/CatchAsync");
 const Farm = require("../models/farm");
 const Product = require("../models/product");
-const { isLoggedIn } = require("../utility/middleware");
+const { isLoggedIn, isAdmin } = require("../utility/middleware");
+const categories = ["fruits", "vegetables"];
 
 router.get("/", async (req, res) => {
   const farms = await Farm.find({});
@@ -15,26 +15,37 @@ router.get("/new", isLoggedIn, async (req, res) => {
   res.render("farms/new.ejs");
 });
 
-router.post("/", async (req, res) => {
-  const farm = new Farm(req.body.farm);
-  await farm.save();
-  req.flash("success", "Successfully made a new farm");
-  res.redirect(`/farms/${farm._id}`);
-});
+router.post(
+  "/",
+  isLoggedIn,
+  catchAsync(async (req, res) => {
+    const farm = new Farm(req.body.farm);
+    farm.admin = req.user._id;
+    await farm.save();
+    req.flash("success", "Successfully made a new farm");
+    res.redirect(`/farms/${farm._id}`);
+  })
+);
 
-router.get("/:id", isLoggedIn, async (req, res) => {
-  const farm = await Farm.findById(req.params.id)
-    .populate("products")
-    .populate("reviews");
-  if (!farm) {
-    req.flash("error", "Cannot find that farm");
-    return res.redirect("/farms");
-  }
-  res.render("farms/show.ejs", { farm });
-});
+router.get(
+  "/:id",
+  catchAsync(async (req, res) => {
+    const farm = await Farm.findById(req.params.id)
+      .populate("products")
+      .populate({ path: "reviews", populate: { path: "author" } })
+      .populate("admin");
+    if (!farm) {
+      req.flash("error", "Cannot find that farm");
+      return res.redirect("/farms");
+    }
+    res.render("farms/show.ejs", { farm });
+  })
+);
 
 router.get(
   "/:id/edit",
+  isLoggedIn,
+  isAdmin,
   catchAsync(async (req, res) => {
     const farm = await Farm.findById(req.params.id);
     res.render("farms/edit.ejs", { farm });
@@ -43,6 +54,8 @@ router.get(
 
 router.put(
   "/:id",
+  isLoggedIn,
+  isAdmin,
   catchAsync(async (req, res) => {
     const { id } = req.params;
     const farm = await Farm.findByIdAndUpdate(id, {
@@ -70,10 +83,15 @@ router.post("/:id/products", async (req, res) => {
   res.redirect(`/farms/${farm._id}`);
 });
 
-router.delete("/:id", async (req, res) => {
-  const farm = await Farm.findByIdAndDelete(req.params.id);
-  req.flash("success", "Successfully deleted farm");
-  res.redirect("/farms");
-});
+router.delete(
+  "/:id",
+  isLoggedIn,
+  isAdmin,
+  catchAsync(async (req, res) => {
+    const farm = await Farm.findByIdAndDelete(req.params.id);
+    req.flash("success", "Successfully deleted farm");
+    res.redirect("/farms");
+  })
+);
 
 module.exports = router;

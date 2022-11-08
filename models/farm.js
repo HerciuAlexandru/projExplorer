@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const Product = require("./product");
 const Review = require("./review");
+
 const farmSchema = new Schema({
   name: {
     type: String,
@@ -23,6 +24,10 @@ const farmSchema = new Schema({
       ref: "Product",
     },
   ],
+  admin: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
   reviews: [
     {
       type: Schema.Types.ObjectId,

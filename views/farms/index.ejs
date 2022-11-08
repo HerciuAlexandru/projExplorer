@@ -8,13 +8,8 @@
         <img src="<%= farm.image %> " class="card-img-top" alt="...">
           <div class="card-body">
             <h5 class="card-title">Farm name :<%=farm.name %></h5>
-  
             <p class="card-text">Farm origin:<%= farm.city %> </p>
-
             <a class="card-link btn btn-info" href="/farms/<%= farm._id %>">Details</a>
-            <form class="d-inline" action="/farms/<%=farm._id %>?_method=DELETE" method="POST">
-                <button class="btn btn-danger">Delete</button>
-            </form>
           </div>
           
         </div>
