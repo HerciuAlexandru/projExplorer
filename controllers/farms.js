@@ -15,6 +15,7 @@ module.exports.createFarm = async (req, res) => {
   const farm = new Farm(req.body.farm);
   farm.admin = req.user._id;
   await farm.save();
+  console.log(`New farm here: ${farm}`);
   req.flash("success", "Successfully made a new farm");
   res.redirect(`/farms/${farm._id}`);
 };

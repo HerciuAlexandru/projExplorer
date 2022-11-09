@@ -1,5 +1,5 @@
 const Farm = require("../models/farm");
-const { reviewSchema } = require("../schemas");
+const { reviewSchema, farmSchema } = require("../schemas");
 const expressError = require("../utility/ExpressError");
 const Review = require("../models/review");
 
@@ -34,6 +34,16 @@ module.exports.isReviewAuthor = async (req, res, next) => {
 
 module.exports.validateReview = (req, res, next) => {
   const { error } = reviewSchema.validate(req.body);
+  if (error) {
+    const msg = error.details.map((el) => el.message).join(",");
+    throw new expressError(msg, 400);
+  } else {
+    next();
+  }
+};
+
+module.exports.validateFarm = (req, res, next) => {
+  const { error } = farmSchema.validate(req.body);
   if (error) {
     const msg = error.details.map((el) => el.message).join(",");
     throw new expressError(msg, 400);

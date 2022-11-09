@@ -6,8 +6,6 @@ const products = require("../controllers/products");
 
 const catchAsync = require("../utility/CatchAsync");
 
-const categories = ["fruits", "vegetables"];
-
 router.get("/", catchAsync(products.index));
 
 router.get("/new", products.renderNewForm);
