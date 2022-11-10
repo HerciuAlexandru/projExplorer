@@ -3,7 +3,7 @@
 <div class="row">
     <h1 class="text-center">Add a farm</h1>
     <div class="col-6 offset-3">
-        <form action="/farms" method="POST" novalidate class="validated-form">
+        <form action="/farms" method="POST" novalidate class="validated-form" enctype="multipart/form-data">
             <div class="mb-3">
                 <label class="form-label" for="name">Name</label>
                 <input class="form-control" type="text" name="farm[name]" id="name" required placeholder="Farm Name">
@@ -27,15 +27,12 @@
                     Looks good!
                   </div>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label" for="image">Image URL</label>
-                <input class="form-control" type="text" name="farm[image]" id="image" required>
-                <div class="valid-feedback">
-                    Looks good!
-                  </div>
-            </div>
-        
+            <div class="input-group mb-3">
+                <label class="input-group-text" for="image">Upload</label>
+                <input type="file" class="form-control" id="image" name="image" multiple>
+              </div>
+              
+              
             <div class="mb-3">
               <button class="btn btn-success">Add Farm  </button>
             </div>

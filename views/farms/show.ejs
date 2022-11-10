@@ -2,9 +2,30 @@
 <link rel="stylesheet" href="/stylesheets/stars.css">
 
         <div class="row">
-            <div class="col-6 col-6">
+            <div class="col-6">
+                <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <% farm.image.forEach((img,i)=>{ %> 
+                      <div class="carousel-item <%= i===0?'active':'' %> ">
+                        <img src="<%= img.url %>" class="d-block w-100" alt="...">
+                      </div>
+                      <% }) %> 
+                    </div>
+
+                    <% if(farm.image.length>1){ %> 
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Next</span>
+                    </button>
+                    <% } %> 
+                  </div>
+                
+
                 <div class="card mb-3">
-                    <img src="<%= farm.image %>" class="card-img-top" alt="...">
                     <div class="card-body">
                         <h5 class="card-title">Name:<%= farm.name %></h5>
                     </div>
@@ -35,6 +56,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-6">
                 <% if(currentUser) { %> 
                 <form action="/farms/<%= farm._id %>/reviews" method="POST" class="mb-3 validated-form" novalidate>
@@ -79,6 +101,4 @@
                  </div>
             </div>
                 <%  }%> 
-
-            </div>
         </div>

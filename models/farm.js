@@ -3,6 +3,15 @@ const Schema = mongoose.Schema;
 const Product = require("./product");
 const Review = require("./review");
 
+const ImageSchema = new Schema({
+  url: String,
+  filename: String,
+});
+
+ImageSchema.virtual("thumbnail").get(function () {
+  return this.url.replace("/upload", "/upload/w_200");
+});
+
 const farmSchema = new Schema({
   name: {
     type: String,
@@ -12,9 +21,7 @@ const farmSchema = new Schema({
     type: String,
     required: true,
   },
-  image: {
-    type: String,
-  },
+  image: [ImageSchema],
   email: {
     type: String,
   },

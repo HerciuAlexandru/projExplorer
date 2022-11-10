@@ -11,7 +11,8 @@ module.exports.farmSchema = Joi.object({
   farm: Joi.object({
     name: Joi.string().required(),
     city: Joi.string().required(),
-    image: Joi.string().required(),
+    // image: Joi.string().required(),
     email: Joi.string().required(),
   }).required(),
+  deleteImages: Joi.array(),
 });

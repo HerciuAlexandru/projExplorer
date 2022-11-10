@@ -3,7 +3,7 @@
 <div class="row">
     <h1 class="text-center">Edit farm</h1>
     <div class="col-6 offset-3">
-        <form action="/farms/<%= farm._id %>?_method=PUT" method="POST" novalidate class="validated-form">
+        <form action="/farms/<%= farm._id %>?_method=PUT" method="POST" novalidate class="validated-form" enctype="multipart/form-data">
             <div class="mb-3">
                 <label class="form-label" for="name">Name</label>
                 <input class="form-control" type="text" name="farm[name]" id="name" required placeholder="Farm Name" value="<%=farm.name %> ">
@@ -29,13 +29,23 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label" for="image">Image URL</label>
-                <input class="form-control" type="text" name="farm[image]" id="image" required value="<%=farm.image %>">
-                <div class="valid-feedback">
-                    Looks good!
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="image">Upload</label>
+                    <input type="file" class="form-control" id="image" name="image" multiple>
                   </div>
             </div>
-        
+            
+            <div class="mb-3">
+                <% farm.image.forEach((img,i)=>{ %> 
+                    <label for="image-<%= i %>">Delete</label>
+                    <div class="form-check-inline">
+                        <input type="checkbox" id="image-<%= i %>" name="deleteImages[]" value="<%=img.filename %>">
+                    </div>
+                    <img src="<%=img.thumbnail %>" class="img-thumbnail" alt="">
+                   
+                   
+                    <% }) %> 
+            </div>
             <div class="mb-3">
               <button class="btn btn-success">Update farm  </button>
               <a class="card-link btn btn-info" href="/farms/<%= farm._id %>/products/new">Add Product</a>

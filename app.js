@@ -1,3 +1,6 @@
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 const express = require("express");
 const app = express();
 const port = 3000;
@@ -11,7 +14,6 @@ const passport = require("passport");
 const localStrategy = require("passport-local");
 const User = require("./models/user");
 
-
 const productsRoutes = require("./routes/products");
 const farmsRoutes = require("./routes/farms");
 const reviewsRoutes = require("./routes/reviews");
@@ -19,6 +21,7 @@ const usersRoutes = require("./routes/users");
 
 const expressError = require("./utility/ExpressError");
 const { isLoggedIn } = require("./utility/middleware");
+
 const sessionConfig = {
   secret: "mysecret",
   resave: false,

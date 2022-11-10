@@ -5,7 +5,7 @@
   <div class="d-flex flex-wrap">
       <% for(let farm of farms){ %> 
       <div class="card mb-3 mx-3" style="width: 400px">
-        <img src="<%= farm.image %> " class="card-img-top" alt="...">
+        <img src="<%= farm.image[0].url %> " class="card-img-top" alt="...">
           <div class="card-body">
             <h5 class="card-title">Farm name :<%=farm.name %></h5>
             <p class="card-text">Farm origin:<%= farm.city %> </p>
