@@ -5,10 +5,13 @@
   <div class="d-flex flex-wrap">
       <% for(let farm of farms){ %> 
       <div class="card mb-3 mx-3" style="width: 400px">
+        <% if(farm.image.length){ %> 
         <img src="<%= farm.image[0].url %> " class="card-img-top" alt="...">
+        <% } else { %>
+          <img src="https://res.cloudinary.com/dcmoi0lpr/image/upload/v1668181723/explorerShop/ldnzrm7skipgvbekt6io.jpg" class="card-img-top" alt="farm pic"> <% } %> 
           <div class="card-body">
             <h5 class="card-title">Farm name :<%=farm.name %></h5>
-            <p class="card-text">Farm origin:<%= farm.city %> </p>
+            <p class="card-text">Farm origin:<%= farm.location %> </p>
             <a class="card-link btn btn-info" href="/farms/<%= farm._id %>">Details</a>
           </div>
           

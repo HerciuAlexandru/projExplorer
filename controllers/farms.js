@@ -1,6 +1,9 @@
 const Farm = require("../models/farm");
 const Product = require("../models/product");
 const cloudinary = require("cloudinary").v2;
+const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
+const mapBoxToken = process.env.MAPBOX_TOKEN;
+const geoCoder = mbxGeocoding({ accessToken: mapBoxToken });
 
 const categories = ["fruits", "vegetables"];
 
@@ -14,7 +17,14 @@ module.exports.renderNewForm = async (req, res) => {
 };
 
 module.exports.createFarm = async (req, res) => {
+  const geoData = await geoCoder
+    .forwardGeocode({
+      query: req.body.farm.location,
+      limit: 1,
+    })
+    .send();
   const farm = new Farm(req.body.farm);
+  farm.geometry = geoData.body.features[0].geometry;
   farm.image = req.files.map((file) => ({
     url: file.path,
     filename: file.filename,

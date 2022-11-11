@@ -17,9 +17,19 @@ const farmSchema = new Schema({
     type: String,
     required: true,
   },
-  city: {
+  geometry: {
+    type: {
+      type: [String],
+      enum: ["Point"],
+      required: true,
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+    },
+  },
+  location: {
     type: String,
-    required: true,
   },
   image: [ImageSchema],
   email: {
