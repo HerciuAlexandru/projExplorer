@@ -1,10 +1,10 @@
 
 <% layout('layouts/boilerplate.ejs') %> 
-
+<div id='map' style='width: 100%; height: 300px;'></div>
   <h1>All farms here:</h1>
   <div class="d-flex flex-wrap">
       <% for(let farm of farms){ %> 
-      <div class="card mb-3 mx-3" style="width: 400px">
+      <div class="card mb-3 mx-3" style="width: 500px">
         <% if(farm.image.length){ %> 
         <img src="<%= farm.image[0].url %> " class="card-img-top" alt="...">
         <% } else { %>
@@ -18,3 +18,10 @@
         </div>
       <% } %> 
   </div>
+
+  <script>
+    const mapToken = `<%-process.env.MAPBOX_TOKEN%>`
+    const farms = {features:<%- JSON.stringify(farms) %>}
+</script>
+
+  <script src="/javascripts/indexClusterMap.js"></script>

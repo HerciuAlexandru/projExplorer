@@ -12,46 +12,51 @@ ImageSchema.virtual("thumbnail").get(function () {
   return this.url.replace("/upload", "/upload/w_200");
 });
 
-const farmSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  geometry: {
-    type: {
-      type: [String],
-      enum: ["Point"],
+const opts = { toJSON: { virtuals: true } };
+
+const farmSchema = new Schema(
+  {
+    name: {
+      type: String,
       required: true,
     },
-    coordinates: {
-      type: [Number],
-      required: true,
+    geometry: {
+      type: {
+        type: [String],
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
     },
-  },
-  location: {
-    type: String,
-  },
-  image: [ImageSchema],
-  email: {
-    type: String,
-  },
-  products: [
-    {
+    location: {
+      type: String,
+    },
+    image: [ImageSchema],
+    email: {
+      type: String,
+    },
+    products: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
+    admin: {
       type: Schema.Types.ObjectId,
-      ref: "Product",
+      ref: "User",
     },
-  ],
-  admin: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
+    reviews: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
   },
-  reviews: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Review",
-    },
-  ],
-});
+  opts
+);
 
 farmSchema.post("findOneAndDelete", async function (farm) {
   if (farm.reviews.length) {
@@ -65,6 +70,10 @@ farmSchema.post("findOneAndDelete", async function (farm) {
     const res = await Product.deleteMany({ _id: { $in: farm.products } });
     console.log(res);
   }
+});
+
+farmSchema.virtual("properties.popUpMarkup").get(function () {
+  return `Welcome to <strong><a href="/farms/${this._id}">${this.name}</a></strong>`;
 });
 
 const Farm = mongoose.model("Farm", farmSchema);
