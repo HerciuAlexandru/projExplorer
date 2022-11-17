@@ -3,8 +3,9 @@ if (process.env.NODE_ENV !== "production") {
 }
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const path = require("path");
+const dbUrl = process.env.DB_URL || "mongodb://localhost:27017/shopExplorer";
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const mongoose = require("mongoose");
@@ -13,6 +14,8 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const localStrategy = require("passport-local");
 const User = require("./models/user");
+const mongoSanitize = require("express-mongo-sanitize");
+const MongoStore = require("connect-mongo");
 
 const productsRoutes = require("./routes/products");
 const farmsRoutes = require("./routes/farms");
@@ -20,10 +23,19 @@ const reviewsRoutes = require("./routes/reviews");
 const usersRoutes = require("./routes/users");
 
 const expressError = require("./utility/ExpressError");
-const { isLoggedIn } = require("./utility/middleware");
+const secret = process.env.SECRET || "mysecret";
+const store = MongoStore.create({
+  mongoUrl: dbUrl,
+  touchAfter: 24 * 60 * 60,
+  crypto: {
+    secret: secret,
+  },
+});
 
 const sessionConfig = {
-  secret: "mysecret",
+  store,
+  name: "abracadabra",
+  secret: secret,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -32,6 +44,7 @@ const sessionConfig = {
     maxAge: 1000 * 60 * 60 * 24 * 7,
   },
 };
+
 // *************************************************************************************************************** //
 app.engine("ejs", ejsMate);
 
@@ -50,6 +63,12 @@ app.use(passport.session()); // persist logIn
 passport.use(new localStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
+app.use(
+  mongoSanitize({
+    replaceWith: "_",
+  })
+);
 
 app.use((req, res, next) => {
   res.locals.currentUser = req.user;
@@ -80,7 +99,7 @@ app.use((err, req, res, next) => {
 
 // ***************************************************************************************************************** //
 mongoose
-  .connect("mongodb://localhost:27017/shopExplorer")
+  .connect(dbUrl)
   .then(() => {
     console.log("Connected to Explorer Shop database...");
   })
@@ -90,5 +109,5 @@ mongoose
   });
 
 app.listen(port, () => {
-  console.log("Listening on port 3000...");
+  console.log(`Listening on port ${port}...`);
 });

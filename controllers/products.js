@@ -1,10 +1,10 @@
 const categories = ["fruits", "vegetables"];
 const Farm = require("../models/farm");
 const Product = require("../models/product");
-const expressError = require("../utility/ExpressError");
 
 module.exports.index = async (req, res) => {
   const { category } = req.query;
+  console.log(req.query);
   if (category) {
     const products = await Product.find({ category });
     res.render("products/index.ejs", { products, category });
