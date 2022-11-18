@@ -1,3 +1,0 @@
-1.tema  -  magazin online
-2.entitate - products ,farms ,reviews
-3.campuri - id,price,name,description,image

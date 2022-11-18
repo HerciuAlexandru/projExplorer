@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const Farm = require("../models/farm");
-const Product = require("../models/product");
-const products = require("../controllers/products");
 
+const products = require("../controllers/products");
 const catchAsync = require("../utility/CatchAsync");
 
 router.get("/", catchAsync(products.index));
